@@ -17,7 +17,7 @@ def densify_path(path, spacing, values=None):
         raise ValueError("Found path array with shape %s. Expected shape (n, 2)"
                              % (str(path.shape)))
 
-    if values is None:
+    if values is not None:
         if len(values)!=len(path):
             raise  ValueError("Length of path and values arrays must match")
 
@@ -47,8 +47,8 @@ def densify_path(path, spacing, values=None):
         interp_points = np.vstack([np.linspace(start[0], end[0], num_steps),
                                    np.linspace(start[1], end[1], num_steps)]).T
         insert_point = xy_where + insert_offset
-        dense_path = np.vstack([xy_out[:insert_point], interp_points[1:-1],
-                            xy_out[insert_point:]])
+        dense_path = np.vstack([dense_path[:insert_point], interp_points[1:-1],
+                            dense_path[insert_point:]])
 
         # keep track of the indexes of values that were inserted
         inserted_dense_path.extend(xrange(insert_point, insert_point + len(interp_points) - 2))
@@ -82,7 +82,7 @@ def interpolate_duplicated_gps(path):
     x_interp = _interp_between_duplicates(path[:,0])
     y_interp = _interp_between_duplicates(path[:,1])
 
-    return np.hstack((x_interp.T, y_interp.T))
+    return np.vstack((x_interp, y_interp)).T
     
 
 def _interp_between_duplicates(x):  
